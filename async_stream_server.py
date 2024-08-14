@@ -10,6 +10,8 @@ from picamera2.outputs import FileOutput
 import time
 import board
 import adafruit_bno055
+import queue
+
 
 # Variáveis globais
 imu_data = "0,0,0,0"
