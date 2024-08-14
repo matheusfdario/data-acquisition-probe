@@ -2,7 +2,7 @@ import io
 import logging
 import socketserver
 from http import server
-from threading import Condition, Thread
+from threading import Condition
 from libcamera import controls
 from picamera2 import Picamera2
 from picamera2.encoders import JpegEncoder
@@ -10,8 +10,6 @@ from picamera2.outputs import FileOutput
 import time
 import board
 import adafruit_bno055
-import queue
-
 
 # Variáveis globais
 imu_data = "0,0,0,0"
@@ -54,11 +52,29 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
         elif self.path.startswith('/focus.html'):
-            # Executa o ajuste de foco em uma thread separada
-            Thread(target=self.handle_focus_request).start()
+            try:
+                number = int(self.path.split('/')[-1])
+                picam2.set_controls({"AfMode": controls.AfModeEnum.Manual, "LensPosition": number})
+                texto = f"LensPosition = {number}"
+            except (ValueError, IndexError):
+                texto = "Por favor, envie um número inteiro positivo."
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(texto))
+            self.end_headers()
+            self.wfile.write(texto.encode('utf-8'))
         elif self.path.startswith('/exposure.html'):
-            # Executa o ajuste de exposição em uma thread separada
-            Thread(target=self.handle_exposure_request).start()
+            try:
+                number = int(self.path.split('/')[-1])
+                picam2.set_controls({"ExposureTime": number})
+                texto = f"ExposureTime = {number}"
+            except (ValueError, IndexError):
+                texto = "Por favor, envie um número inteiro positivo."
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(texto))
+            self.end_headers()
+            self.wfile.write(texto.encode('utf-8'))
         elif self.path == '/stream.mjpg':
             self.send_response(200)
             self.send_header('Age', 0)
@@ -84,32 +100,6 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         else:
             self.send_error(404)
             self.end_headers()
-
-    def handle_focus_request(self):
-        try:
-            number = int(self.path.split('/')[-1])
-            picam2.set_controls({"AfMode": controls.AfModeEnum.Manual, "LensPosition": number})
-            texto = f"LensPosition = {number}"
-        except (ValueError, IndexError):
-            texto = "Por favor, envie um número inteiro positivo."
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(texto))
-        self.end_headers()
-        self.wfile.write(texto.encode('utf-8'))
-
-    def handle_exposure_request(self):
-        try:
-            number = int(self.path.split('/')[-1])
-            picam2.set_controls({"ExposureTime": number})
-            texto = f"ExposureTime = {number}"
-        except (ValueError, IndexError):
-            texto = "Por favor, envie um número inteiro positivo."
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(texto))
-        self.end_headers()
-        self.wfile.write(texto.encode('utf-8'))
 
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
