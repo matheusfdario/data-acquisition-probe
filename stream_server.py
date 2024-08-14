@@ -64,7 +64,10 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
         elif self.path == '/imu.html':
-            texto = str(sensor.quaternion)
+            if bno_enabled == True:
+                texto = str(sensor.quaternion)
+            else:
+                texto = "0,0,0,0"
             content = texto.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
@@ -138,7 +141,15 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     daemon_threads = True
 
 i2c = board.I2C()
-sensor = adafruit_bno055.BNO055_I2C(i2c, 0x29)
+bno_enabled = False
+
+try:
+    sensor = adafruit_bno055.BNO055_I2C(i2c, 0x29)
+    bno_enabled = True
+except:
+    print("Erro ao inciar o BNO055")
+    bno_enabled = False
+
 
 picam2 = Picamera2()
 picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
