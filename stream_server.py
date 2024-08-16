@@ -32,7 +32,6 @@ PAGE = f'''\
 <body>
 <h1>Picamera3 MJPEG Streaming Demo</h1>
 <img src="stream.mjpg" width="640" height="480" />
-<h2>IMU: {imu_data}</h2>
 </body>
 </html>
 '''
