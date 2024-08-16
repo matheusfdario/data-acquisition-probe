@@ -64,9 +64,11 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.wfile.write(content)
         elif self.path == '/imu.html':
             if bno_enabled == True:
-                texto = str(sensor.quaternion)
+                texto0 = str(sensor.quaternion)
             else:
-                texto = "0,0,0,0"
+                texto0 = "0,0,0,0"
+            t1 = str(time.time())
+            texto = t0 + "_" + t1 + "_" + texto0
             content = texto.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
@@ -84,6 +86,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                 texto = "Por favor, envie um número inteiro positivo."
             number = float(number)
             picam2.set_controls({"AfMode": controls.AfModeEnum.Manual, "LensPosition": number}) #"LensPosition": number (number -- set the focus position to 1/number, number is any value you set, for example, if you set 2, it means that it will focus on the position of 0.5m.)
+            t0 = str(time.time())
             content = texto.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
@@ -102,6 +105,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             #number = float(number)
             picam2.set_controls({"AfMode": controls.AfModeEnum.Manual, "LensPosition": number}) #"LensPosition": number (number -- set the focus position to 1/number, number is any value you set, for example, if you set 2, it means that it will focus on the position of 0.5m.)
             picam2.set_controls({"ExposureTime": number})
+            t0 = str(time.time())
             content = texto.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
@@ -159,6 +163,7 @@ time.sleep(2)
 output = StreamingOutput()
 picam2.start_recording(JpegEncoder(), FileOutput(output))
 
+t0 = str(time.time())
 try:
     address = ('', 7123)
     server = StreamingServer(address, StreamingHandler)
