@@ -52,6 +52,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
     
     def do_GET(self):
+        global t0  # Declara que t0 é uma variável global
         if self.path == '/':
             self.send_response(301)
             self.send_header('Location', '/index.html')
