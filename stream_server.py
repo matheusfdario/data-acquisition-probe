@@ -35,6 +35,7 @@ PAGE = f'''\
 </body>
 </html>
 '''
+t0 = str(time.time())
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -48,7 +49,7 @@ class StreamingOutput(io.BufferedIOBase):
 
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
-    
+
     
     def do_GET(self):
         if self.path == '/':
@@ -163,7 +164,7 @@ time.sleep(2)
 output = StreamingOutput()
 picam2.start_recording(JpegEncoder(), FileOutput(output))
 
-t0 = str(time.time())
+
 try:
     address = ('', 7123)
     server = StreamingServer(address, StreamingHandler)
