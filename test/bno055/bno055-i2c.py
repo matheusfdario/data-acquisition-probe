@@ -47,7 +47,7 @@ sensor = adafruit_bno055.BNO055_I2C(i2c,0x29)
 
 last_val = 0xFFFF
 
-
+time.sleep(1)
 
 def temperature():
 
