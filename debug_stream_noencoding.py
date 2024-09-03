@@ -2,7 +2,6 @@ from picamera2 import Picamera2
 import numpy as np
 import io
 
-
 def capture_image():
     picam2 = Picamera2()
     picam2.start_preview()
@@ -17,9 +16,6 @@ def capture_image():
 
     picam2.close()
     return image
-
-
-
 
 import socket
 import pickle
