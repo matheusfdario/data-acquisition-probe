@@ -4,7 +4,7 @@ import socketserver
 from http import server
 from threading import Condition
 from libcamera import controls
-from picamera2 import Picamera2, Output
+from picamera2 import Picamera2
 import time
 import board
 import adafruit_bno055
@@ -26,7 +26,7 @@ PAGE = f'''\
 '''
 t0 = str(time.time())
 
-class NoEncodingOutput(Output):
+class NoEncodingOutput(io.BufferedIOBase):
     def __init__(self):
         self.frame = None
         self.condition = Condition()
@@ -103,13 +103,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             try:
                 while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                    # Converte o frame de JPEG para um array numpy
-                    np_frame = np.frombuffer(frame, dtype=np.uint8)
-                    # Decodifica o frame para imagem em escala de cinza
-                    gray_frame = cv2.imdecode(np_frame, cv2.IMREAD_GRAYSCALE)
+                    frame = picam2.capture_array()
+                    # Converte a imagem para escala de cinza
+                    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     # Codifica a imagem em formato BMP
                     _, bmp_frame = cv2.imencode('.bmp', gray_frame)
                     self.wfile.write(bmp_frame.tobytes())
@@ -139,10 +135,6 @@ picam2 = Picamera2()
 picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
 picam2.controls.FrameRate = 60
 time.sleep(2)
-
-# Initialize the output stream
-output = NoEncodingOutput()
-picam2.start_recording(output=output)
 
 try:
     address = ('', 7123)
