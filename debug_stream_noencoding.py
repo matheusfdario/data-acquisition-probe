@@ -23,7 +23,7 @@ import pickle
 def send_image(image):
     # Configura o socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('IP_DO_PI5', 12345))  # Substitua 'IP_DO_PI5' pelo IP do Pi5
+    s.connect(('rasp5encoder00.local', 12345))  # Substitua 'IP_DO_PI5' pelo IP do Pi5
 
     # Serializa o array numpy
     data = pickle.dumps(image)
