@@ -4,8 +4,7 @@ import socketserver
 from http import server
 from threading import Condition
 from libcamera import controls
-from picamera2 import Picamera2
-from picamera2.outputs import Output
+from picamera2 import Picamera2, Output
 import time
 import board
 import adafruit_bno055
@@ -27,7 +26,7 @@ PAGE = f'''\
 '''
 t0 = str(time.time())
 
-class StreamingOutput(io.BufferedIOBase):
+class NoEncodingOutput(Output):
     def __init__(self):
         self.frame = None
         self.condition = Condition()
@@ -53,7 +52,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
         elif self.path == '/imu.html':
-            if bno_enabled == True:
+            if bno_enabled:
                 texto0 = str(sensor.quaternion)
             else:
                 texto0 = "0,0,0,0"
@@ -141,18 +140,9 @@ picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
 picam2.controls.FrameRate = 60
 time.sleep(2)
 
-class NoEncodingOutput(Output):
-    def __init__(self):
-        self.frame = None
-        self.condition = Condition()
-
-    def write(self, buf):
-        with self.condition:
-            self.frame = buf
-            self.condition.notify_all()
-
+# Initialize the output stream
 output = NoEncodingOutput()
-picam2.start_recording(output)
+picam2.start_recording(output=output)
 
 try:
     address = ('', 7123)
