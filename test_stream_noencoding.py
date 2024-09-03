@@ -5,7 +5,6 @@ from http import server
 from threading import Condition
 from libcamera import controls
 from picamera2 import Picamera2
-from picamera2.encoders import JpegEncoder
 from picamera2.outputs import FileOutput
 import time
 import board
@@ -22,7 +21,7 @@ PAGE = f'''\
 </head>
 <body>
 <h1>Picamera3 Streaming Demo</h1>
-<img src="stream.mjpg" width="640" height="480" />
+<img src="stream.bmp" width="640" height="480" />
 </body>
 </html>
 '''
@@ -96,12 +95,12 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
+        elif self.path == '/stream.bmp':
             self.send_response(200)
             self.send_header('Age', 0)
             self.send_header('Cache-Control', 'no-cache, private')
             self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.send_header('Content-Type', 'image/bmp')
             self.end_headers()
             try:
                 while True:
@@ -112,14 +111,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                     np_frame = np.frombuffer(frame, dtype=np.uint8)
                     # Decodifica o frame para imagem em escala de cinza
                     gray_frame = cv2.imdecode(np_frame, cv2.IMREAD_GRAYSCALE)
-                    # Codifica a imagem em bruto (sem compressão)
-                    _, raw_frame = cv2.imencode('.jpg', gray_frame, [cv2.IMWRITE_JPEG_QUALITY, 100])
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(raw_frame))
-                    self.end_headers()
-                    self.wfile.write(raw_frame)
-                    self.wfile.write(b'\r\n')
+                    # Codifica a imagem em formato BMP
+                    _, bmp_frame = cv2.imencode('.bmp', gray_frame)
+                    self.wfile.write(bmp_frame.tobytes())
             except Exception as e:
                 logging.warning(
                     'Removed streaming client %s: %s',
