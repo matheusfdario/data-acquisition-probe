@@ -11,7 +11,7 @@ def transmit(sock, data):
     sock.sendall(serial_data)
 
 with socket.socket() as s:
-    s.connect(('localhost', 5000))
+    s.connect(('rasp5encoder00.local', 5000))
     data = np.array([[1,2,3],[4,5,6],[7,8,9]], dtype=np.float32)
     transmit(s, data)
     data = np.array([[[1,2],[3,4]],[[5,6],[7,8]]], dtype=np.int16)
