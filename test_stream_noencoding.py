@@ -5,6 +5,7 @@ from http import server
 from threading import Condition
 from libcamera import controls
 from picamera2 import Picamera2
+from picamera2.encoders import JpegEncoder
 from picamera2.outputs import FileOutput
 import time
 import board
