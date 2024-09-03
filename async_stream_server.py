@@ -116,7 +116,7 @@ except:
 
 # Inicialização da câmera
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+picam2.configure(picam2.create_video_configuration(main={"size": (320, 320)}))
 picam2.controls.FrameRate = 60  # Definindo a taxa de quadros
 time.sleep(2)
 output = StreamingOutput()
