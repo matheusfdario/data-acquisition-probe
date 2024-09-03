@@ -22,7 +22,7 @@ PAGE = f'''\
 </head>
 <body>
 <h1>Picamera3 MJPEG Streaming Demo</h1>
-<img src="stream.mjpg" width="640" height="480" />
+<img src="stream.mjpg" width="320" height="320" />
 <h2>IMU: {imu_data}</h2>
 </body>
 </html>
