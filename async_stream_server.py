@@ -22,7 +22,7 @@ PAGE = f'''\
 </head>
 <body>
 <h1>Picamera3 MJPEG Streaming Demo</h1>
-<img src="stream.mjpg" width="640" height="480" />
+<img src="stream.mjpg" width="320" height="320" />
 <h2>IMU: {imu_data}</h2>
 </body>
 </html>
@@ -116,7 +116,7 @@ except:
 
 # Inicialização da câmera
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+picam2.configure(picam2.create_video_configuration(main={"size": (320, 320)}))
 picam2.controls.FrameRate = 60  # Definindo a taxa de quadros
 time.sleep(2)
 output = StreamingOutput()
